@@ -1,10 +1,11 @@
-const encrypt = false;
-const targetLocation = __dirname + "\\target.txt";
-
 (async function() {
-    const zeroSleep = false;
     const fs = require('fs');
     const rsa = require('node-rsa');
+
+    const zeroSleep = true;
+    // check if file is already encrypted or not
+    const file = fs.readdirSync(__dirname).filter(f => f.startsWith("target."))[0];
+    const targetLocation = __dirname + "\\" + file;
 
     function sleep(ms) {
         if (!zeroSleep) {
@@ -28,7 +29,7 @@ const targetLocation = __dirname + "\\target.txt";
     console.log("Retrieved target file data");
     await sleep(1000);
 
-    if (encrypt) {
+    if (file == "target.txt") {
         console.log("Running encryption workflow...");
         await sleep(1000);
         console.log("Fetching public key...");
@@ -52,6 +53,8 @@ const targetLocation = __dirname + "\\target.txt";
         fs.writeFileSync(targetLocation, encryptedText);
         console.log("Wrote encrypted data back to target file");
         await sleep(1000);
+
+        fs.renameSync("./target.txt", "./target.txt.locked");
         console.log("Finished encryption workflow");
     } else {
         console.log("Running decryption workflow...");
@@ -78,6 +81,7 @@ const targetLocation = __dirname + "\\target.txt";
         fs.writeFileSync(targetLocation, decryptedText);
         console.log("Wrote decrypted data back to target file");
         await sleep(1000);
+        fs.renameSync("./target.txt.locked", "./target.txt");
         console.log("Finished decryption workflow");
     }
 })();
